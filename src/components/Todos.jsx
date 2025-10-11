@@ -46,7 +46,7 @@ const Todos = () => {
         return { label: "Không xác định", color: "#9e9e9e" };
     }
   };
-
+  console.log(sortOrder);
   return (
     <div
       style={{
@@ -55,9 +55,12 @@ const Todos = () => {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <a href="http://localhost:5173/">
-        <h1 style={{ textAlign: "center" }}>Danh sách công việc</h1>
-      </a>
+      <h1
+        style={{ textAlign: "center", cursor: "pointer" }}
+        onClick={() => (window.location.href = "/")}
+      >
+        Danh sách công việc
+      </h1>
 
       <div
         style={{
