@@ -1,10 +1,10 @@
 // import "./App.css";
-import Todos from "./components/Todos";
+import AppRouter from "./routes";
 
 function App() {
   return (
     <>
-      <Todos />
+      <AppRouter />
     </>
   );
 }

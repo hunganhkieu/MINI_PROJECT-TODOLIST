@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -7,7 +8,8 @@ const Todos = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterPriority, setFilterPriority] = useState("");
   const [sortOrder, setSortOrder] = useState("");
-
+  const [filterComplete, setFilterComplete] = useState("");
+  // const [filterDueDate, setFilterDueDate] = useState("");
   useEffect(() => {
     const fetchTodos = async () => {
       try {
@@ -16,7 +18,7 @@ const Todos = () => {
             search ? `&q=${search}` : ""
           }${filterPriority ? `&priority=${filterPriority}` : ""}${
             sortOrder ? `&_sort=priority&_order=${sortOrder}` : ""
-          }`
+          }&completed=${filterComplete}`
         ).then((res) => res.json());
         setTodos(response.data);
         setMetaData(response.meta);
@@ -25,7 +27,7 @@ const Todos = () => {
       }
     };
     fetchTodos();
-  }, [search, currentPage, filterPriority, sortOrder]);
+  }, [search, currentPage, filterPriority, sortOrder, filterComplete]);
 
   const CheckCompleted = (item) => {
     if (item.completed) return { text: "Hoàn thành", color: "#4caf50" };
@@ -46,7 +48,14 @@ const Todos = () => {
         return { label: "Không xác định", color: "#9e9e9e" };
     }
   };
-  console.log(sortOrder);
+
+  const handleReset = () => {
+    setSearch("");
+    setFilterPriority("");
+    setFilterComplete("");
+    setSortOrder("");
+    setCurrentPage(1);
+  };
   return (
     <div
       style={{
@@ -55,13 +64,6 @@ const Todos = () => {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1
-        style={{ textAlign: "center", cursor: "pointer" }}
-        onClick={() => (window.location.href = "/")}
-      >
-        Danh sách công việc
-      </h1>
-
       <div
         style={{
           display: "flex",
@@ -69,6 +71,7 @@ const Todos = () => {
           marginBottom: 15,
         }}
       >
+        {/* search */}
         <input
           type="text"
           placeholder="Nhập từ khóa..."
@@ -83,6 +86,7 @@ const Todos = () => {
           }}
         />
 
+        {/* filter Priority */}
         <select
           value={filterPriority}
           onChange={(e) => {
@@ -97,6 +101,7 @@ const Todos = () => {
           <option value="3">Cao</option>
         </select>
 
+        {/* sort Priority */}
         <select
           value={sortOrder}
           onChange={(e) => {
@@ -109,6 +114,36 @@ const Todos = () => {
           <option value="asc">Thấp đến Cao</option>
           <option value="desc">Cao đến Thấp</option>
         </select>
+
+        {/* filter Completed */}
+        <select
+          name=""
+          id=""
+          value={filterComplete}
+          onChange={(e) => {
+            setFilterComplete(e.target.value);
+            // const dataToday = new Date();
+            // dataToday.setDate(dataToday.getDate() + 1);
+            // const valueDate = dataToday.toISOString().slice(0, 10);
+            // setFilterComplete(e.target.value);
+            // if (e.target.value === "overdue") {
+            //   setFilterComplete(false);
+            //   setFilterDueDate(valueDate);
+            // }
+            // if (e.target.value === "sai") {
+            //   setFilterComplete(false);
+            //   setFilterDueDate(valueDate);
+            //   // console.log(object);
+            // }
+          }}
+        >
+          <option value="">Trạng thái công việc</option>
+          <option value="false">Đang thực hiện</option>
+          <option value="overdue">Quá hạn</option>
+          <option value="true">Hoàn thành</option>
+        </select>
+
+        <button onClick={handleReset}>reset</button>
       </div>
 
       <div
@@ -152,6 +187,9 @@ const Todos = () => {
                 <p>
                   Deadline: {new Date(item.dueDate).toLocaleDateString("vi-VN")}
                 </p>
+                <Link to={`${item._id}`}>
+                  <button>Xem chi tiết</button>
+                </Link>
               </div>
             );
           })
