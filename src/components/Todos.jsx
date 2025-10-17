@@ -140,19 +140,17 @@ const Todos = () => {
             // dataToday.setDate(dataToday.getDate() + 1);
             const valueDate = dataToday.toISOString().slice(0, 10);
             setFilterComplete(e.target.value);
-
             if (e.target.value === "overdue") {
               setFilterComplete("false");
               setFilterDueDate_lte(valueDate);
             }
-
             if (e.target.value === "false") {
               setFilterComplete(e.target.value);
               setFilterDueDate_gte(valueDate);
             }
 
             if (e.target.value === "true") {
-              setFilterDueDate_lte(false);
+              setFilterComplete(e.target.value);
             }
           }}
         >
