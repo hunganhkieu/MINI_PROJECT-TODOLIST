@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Layout, theme } from "antd";
 import { Outlet } from "react-router-dom";
-import Sidebar from "./SideBar";
+import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { Header } from "antd/es/layout/layout";
 
