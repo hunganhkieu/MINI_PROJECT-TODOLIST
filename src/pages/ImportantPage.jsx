@@ -4,7 +4,7 @@ const ImportantPage = () => {
   const [todos, setTodos] = useState([]);
   const fetchProduct = async () => {
     const response = await fetch(
-      "https://api-class-o1lo.onrender.com/api/v1/todos/?priority=3"
+      "https://api-class-o1lo.onrender.com/api/anhkh/todos/?priority=3"
     ).then((res) => res.json());
     setTodos(response.data);
   };
@@ -14,7 +14,7 @@ const ImportantPage = () => {
   }, []);
 
   const CheckCompleted = (item) => {
-    if (item.completed) return { text: "Hoàn thành", color: "#4caf50" };
+    if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
     if (new Date(item.dueDate) < new Date())
       return { text: "Quá hạn", color: "#f44336" };
     return { text: "Đang thực hiện", color: "#ff9800" };

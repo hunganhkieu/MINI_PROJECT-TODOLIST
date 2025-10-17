@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { deleteTodo } from "../api/apiTodo";
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -11,25 +12,24 @@ const Todos = () => {
   const [filterComplete, setFilterComplete] = useState("");
   const [filterDueDate_lte, setFilterDueDate_lte] = useState("");
   const [filterDueDate_gte, setFilterDueDate_gte] = useState("");
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const response = await fetch(
-          `https://api-class-o1lo.onrender.com/api/v1/todos/?_limit=4&_page=${currentPage}${
-            search ? `&q=${search}` : ""
-          }${filterPriority ? `&priority=${filterPriority}` : ""}${
-            sortOrder ? `&_sort=priority&_order=${sortOrder}` : ""
-          }${filterComplete ? `&completed=${filterComplete}` : filterComplete}${
-            filterDueDate_lte ? `&dueDate_lte=${filterDueDate_lte}` : ""
-          }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`
-        ).then((res) => res.json());
-        setTodos(response.data);
-        setMetaData(response.meta);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTodos();
+
+  const fetchTodos = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `https://api-class-o1lo.onrender.com/api/anhkh/todos/?_limit=6&_page=${currentPage}${
+          search ? `&q=${search}` : ""
+        }${filterPriority ? `&priority=${filterPriority}` : ""}${
+          sortOrder ? `&_sort=priority&_order=${sortOrder}` : ""
+        }${filterComplete ? `&isCompleted=${filterComplete}` : filterComplete}${
+          filterDueDate_lte ? `&dueDate_lte=${filterDueDate_lte}` : ""
+        }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`
+      ).then((res) => res.json());
+
+      setTodos(response.data);
+      setMetaData(response.meta);
+    } catch (error) {
+      console.error(error);
+    }
   }, [
     search,
     currentPage,
@@ -40,8 +40,12 @@ const Todos = () => {
     filterDueDate_gte,
   ]);
 
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
   const CheckCompleted = (item) => {
-    if (item.completed) return { text: "Hoàn thành", color: "#4caf50" };
+    if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
     if (new Date(item.dueDate) < new Date())
       return { text: "Quá hạn", color: "#f44336" };
     return { text: "Đang thực hiện", color: "#ff9800" };
@@ -66,6 +70,13 @@ const Todos = () => {
     setFilterComplete("");
     setSortOrder("");
     setCurrentPage(1);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Bạn có muốn xóa ko?")) return;
+    await deleteTodo(id);
+    alert("Xóa thành công");
+    fetchTodos();
   };
   return (
     <div
@@ -163,6 +174,12 @@ const Todos = () => {
         <button onClick={handleReset}>reset</button>
       </div>
 
+      <div>
+        <Link to="add">
+          <button>Thêm mới công việc</button>
+        </Link>
+      </div>
+
       <div
         style={{
           display: "grid",
@@ -207,6 +224,13 @@ const Todos = () => {
                 <Link to={`${item._id}`}>
                   <button>Xem chi tiết</button>
                 </Link>
+                <Link to={`update/${item._id}`}>
+                  <button>update</button>
+                </Link>
+
+                <button onClick={() => handleDelete(item._id)}>
+                  Xóa công việc
+                </button>
               </div>
             );
           })

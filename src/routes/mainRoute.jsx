@@ -4,6 +4,7 @@ import Todos from "../components/Todos";
 import { Navigate } from "react-router-dom";
 import ImportantPage from "../pages/ImportantPage";
 import TodoDetailPage from "../pages/TodoDetailPage";
+import FormTodo from "../pages/FormTodo";
 
 const mainRoute = [
   {
@@ -14,6 +15,8 @@ const mainRoute = [
       { path: "todos", Component: Todos },
       { path: "important", Component: ImportantPage },
       { path: "todos/:id", Component: TodoDetailPage },
+      { path: "todos/add", Component: FormTodo },
+      { path: "todos/update/:id", Component: FormTodo },
     ],
   },
 ];

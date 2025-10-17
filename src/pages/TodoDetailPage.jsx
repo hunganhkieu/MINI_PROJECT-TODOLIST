@@ -8,7 +8,7 @@ const TodoDetailPage = () => {
   const fetchProductId = async () => {
     try {
       const response = await fetch(
-        `https://api-class-o1lo.onrender.com/api/v1/todos/${id}`
+        `https://api-class-o1lo.onrender.com/api/anhkh/todos/${id}`
       );
       const { data } = await response.json();
       setTodos(data);
@@ -24,7 +24,7 @@ const TodoDetailPage = () => {
 
   const CheckCompleted = (item) => {
     if (!item) return { text: "Đang tải...", color: "#9e9e9e" };
-    if (item.completed) return { text: "Hoàn thành", color: "#4caf50" };
+    if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
     if (new Date(item.dueDate) < new Date())
       return { text: "Quá hạn", color: "#f44336" };
     return { text: "Đang thực hiện", color: "#ff9800" };
