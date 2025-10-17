@@ -12,7 +12,7 @@ const TodoDetailPage = () => {
       );
       const { data } = await response.json();
       setTodos(data);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.log(error);
     }

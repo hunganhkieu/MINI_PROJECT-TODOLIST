@@ -9,7 +9,8 @@ const Todos = () => {
   const [filterPriority, setFilterPriority] = useState("");
   const [sortOrder, setSortOrder] = useState("");
   const [filterComplete, setFilterComplete] = useState("");
-  // const [filterDueDate, setFilterDueDate] = useState("");
+  const [filterDueDate_lte, setFilterDueDate_lte] = useState("");
+  const [filterDueDate_gte, setFilterDueDate_gte] = useState("");
   useEffect(() => {
     const fetchTodos = async () => {
       try {
@@ -18,7 +19,9 @@ const Todos = () => {
             search ? `&q=${search}` : ""
           }${filterPriority ? `&priority=${filterPriority}` : ""}${
             sortOrder ? `&_sort=priority&_order=${sortOrder}` : ""
-          }&completed=${filterComplete}`
+          }${filterComplete ? `&completed=${filterComplete}` : filterComplete}${
+            filterDueDate_lte ? `&dueDate_lte=${filterDueDate_lte}` : ""
+          }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`
         ).then((res) => res.json());
         setTodos(response.data);
         setMetaData(response.meta);
@@ -27,7 +30,15 @@ const Todos = () => {
       }
     };
     fetchTodos();
-  }, [search, currentPage, filterPriority, sortOrder, filterComplete]);
+  }, [
+    search,
+    currentPage,
+    filterPriority,
+    sortOrder,
+    filterComplete,
+    filterDueDate_lte,
+    filterDueDate_gte,
+  ]);
 
   const CheckCompleted = (item) => {
     if (item.completed) return { text: "Hoàn thành", color: "#4caf50" };
@@ -122,19 +133,27 @@ const Todos = () => {
           value={filterComplete}
           onChange={(e) => {
             setFilterComplete(e.target.value);
-            // const dataToday = new Date();
+            setFilterDueDate_lte("");
+            setFilterDueDate_gte("");
+
+            const dataToday = new Date();
             // dataToday.setDate(dataToday.getDate() + 1);
-            // const valueDate = dataToday.toISOString().slice(0, 10);
-            // setFilterComplete(e.target.value);
-            // if (e.target.value === "overdue") {
-            //   setFilterComplete(false);
-            //   setFilterDueDate(valueDate);
-            // }
-            // if (e.target.value === "sai") {
-            //   setFilterComplete(false);
-            //   setFilterDueDate(valueDate);
-            //   // console.log(object);
-            // }
+            const valueDate = dataToday.toISOString().slice(0, 10);
+            setFilterComplete(e.target.value);
+
+            if (e.target.value === "overdue") {
+              setFilterComplete("false");
+              setFilterDueDate_lte(valueDate);
+            }
+
+            if (e.target.value === "false") {
+              setFilterComplete(e.target.value);
+              setFilterDueDate_gte(valueDate);
+            }
+
+            if (e.target.value === "true") {
+              setFilterDueDate_lte(false);
+            }
           }}
         >
           <option value="">Trạng thái công việc</option>
