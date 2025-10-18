@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { createTodo, getTodoId, updateTodo } from "../api/apiTodo";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Checkbox,
+  Button,
+  Card,
+  message,
+} from "antd";
+import dayjs from "dayjs";
+
+const { TextArea } = Input;
+const { Option } = Select;
 
 const FormTodo = () => {
   const { id } = useParams();
@@ -19,6 +33,14 @@ const FormTodo = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleSelectChange = (value) => {
+    setFormData({ ...formData, priority: value });
+  };
+
+  const handleDateChange = (date, dateString) => {
+    setFormData({ ...formData, dueDate: dateString });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     formData.priority = Number(formData.priority);
@@ -27,42 +49,38 @@ const FormTodo = () => {
       formData.name.length < 3 ||
       formData.name.length > 80
     ) {
-      alert(
-        "Tên ko được để trống, tên phải tối thiểu 3 ký tự và tối đa 80 ký tự"
-      );
+      message.warning("Tên công việc phải từ 3 - 80 ký tự");
       return;
     }
     if (!formData.dueDate) {
-      alert("Hạn hoàn thành công việc ko được để trống");
+      message.warning("Vui lòng chọn hạn hoàn thành công việc");
       return;
     }
 
     try {
       if (!id) {
         await createTodo(formData);
-        alert("Thêm mới thành công");
+        message.success("Thêm mới thành công");
         nav("/todos");
-        console.log(formData);
-      }
-      if (id) {
+      } else {
         await updateTodo(id, formData);
-        alert("Cập nhật thành công");
+        message.success("Cập nhật thành công");
         nav("/todos");
-        console.log(formData);
       }
     } catch (error) {
       console.log(error);
-      alert("Lỗi rồi");
+      message.error("Đã xảy ra lỗi khi xử lý");
     }
   };
+
   const handleCheckBox = (e) => {
     const { checked, name } = e.target;
     setFormData((pre) => ({
       ...pre,
       [name]: checked,
     }));
-    console.log(name, checked);
   };
+
   useEffect(() => {
     if (id) {
       (async () => {
@@ -83,69 +101,78 @@ const FormTodo = () => {
       })();
     }
   }, [id]);
+
   return (
-    <div>
-      <form action="" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="">Tên công việc</label>
-          <input
-            type="text"
-            name="name"
-            onChange={handleChange}
-            value={formData.name}
-          />
-        </div>
-        <div>
-          <label htmlFor="">Mức độ ưu tiên</label>
-          <select
-            name="priority"
-            id="priority"
-            onChange={handleChange}
-            value={formData.priority}
-          >
-            <option value={1}>Thấp</option>
-            <option value={2}>Trung bình</option>
-            <option value={3}>Cao</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="">Mô tả công việc</label>
-          <textarea
-            name="description"
-            id="description"
-            onChange={handleChange}
-            value={formData.description}
-          ></textarea>
-        </div>
-
-        <div>
-          <label htmlFor="">Hạn chót hoàn thành công việc</label>
-          <input
-            type="date"
-            name="dueDate"
-            onChange={handleChange}
-            value={formData.dueDate}
-          />
-        </div>
-
-        {id ? (
-          <div>
-            <label htmlFor="">Trạng thái công việc</label>
-            <input
-              type="checkbox"
-              name="isCompleted"
-              checked={formData.isCompleted}
-              onChange={handleCheckBox}
-              disabled={
-                formData.isCompleted || new Date(formData.dueDate) < new Date()
-              }
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 40 }}>
+      <Card
+        title={!id ? "Thêm công việc mới" : "Cập nhật công việc"}
+        style={{ width: 500, boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}
+      >
+        <Form layout="vertical" onSubmitCapture={handleSubmit}>
+          <Form.Item label="Tên công việc" required>
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Nhập tên công việc"
             />
-            <label htmlFor="">Hoàn thành</label>
-          </div>
-        ) : null}
-        <button>{!id ? "Thêm mới" : "Cập nhật"}</button>
-      </form>
+          </Form.Item>
+
+          <Form.Item label="Mức độ ưu tiên">
+            <Select
+              value={formData.priority}
+              onChange={handleSelectChange}
+              name="priority"
+            >
+              <Option value={1}>Thấp</Option>
+              <Option value={2}>Trung bình</Option>
+              <Option value={3}>Cao</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item label="Mô tả công việc">
+            <TextArea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Nhập mô tả công việc"
+            />
+          </Form.Item>
+
+          <Form.Item label="Hạn chót hoàn thành công việc" required>
+            <DatePicker
+              style={{ width: "100%" }}
+              name="dueDate"
+              onChange={handleDateChange}
+              value={formData.dueDate ? dayjs(formData.dueDate) : null}
+              format="YYYY-MM-DD"
+            />
+          </Form.Item>
+
+          {id && (
+            <Form.Item label="Trạng thái công việc">
+              <Checkbox
+                name="isCompleted"
+                checked={formData.isCompleted}
+                onChange={handleCheckBox}
+                disabled={
+                  formData.isCompleted ||
+                  new Date(formData.dueDate) < new Date()
+                }
+              >
+                Hoàn thành
+              </Checkbox>
+            </Form.Item>
+          )}
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              {!id ? "Thêm mới" : "Cập nhật"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };

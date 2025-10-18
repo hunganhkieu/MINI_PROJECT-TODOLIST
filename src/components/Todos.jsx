@@ -1,6 +1,19 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteTodo } from "../api/apiTodo";
+import {
+  Button,
+  Input,
+  Select,
+  Card,
+  Space,
+  Row,
+  Col,
+  Tag,
+  message,
+} from "antd";
+
+const { Option } = Select;
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
@@ -24,7 +37,6 @@ const Todos = () => {
           filterDueDate_lte ? `&dueDate_lte=${filterDueDate_lte}` : ""
         }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`
       ).then((res) => res.json());
-
       setTodos(response.data);
       setMetaData(response.meta);
     } catch (error) {
@@ -45,22 +57,22 @@ const Todos = () => {
   }, [fetchTodos]);
 
   const CheckCompleted = (item) => {
-    if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
+    if (item.isCompleted) return { text: "Hoàn thành", color: "green" };
     if (new Date(item.dueDate) < new Date())
-      return { text: "Quá hạn", color: "#f44336" };
-    return { text: "Đang thực hiện", color: "#ff9800" };
+      return { text: "Quá hạn", color: "red" };
+    return { text: "Đang thực hiện", color: "orange" };
   };
 
   const getPriorityLabel = (priority) => {
     switch (priority) {
       case 1:
-        return { label: "Thấp", color: "#90caf9" };
+        return { label: "Thấp", color: "blue" };
       case 2:
-        return { label: "Trung bình", color: "#fdd835" };
+        return { label: "Trung bình", color: "gold" };
       case 3:
-        return { label: "Cao", color: "#f44336" };
+        return { label: "Cao", color: "red" };
       default:
-        return { label: "Không xác định", color: "#9e9e9e" };
+        return { label: "Không xác định", color: "default" };
     }
   };
 
@@ -73,42 +85,21 @@ const Todos = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Bạn có muốn xóa ko?")) return;
+    if (!window.confirm("Bạn có muốn xóa không?")) return;
     await deleteTodo(id);
-    alert("Xóa thành công");
+    message.success("Xóa thành công");
     fetchTodos();
   };
+
   return (
-    <div
-      style={{
-        maxWidth: 900,
-        margin: "20px auto",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 15,
-        }}
-      >
-        {/* search */}
-        <input
-          type="text"
+    <div style={{ maxWidth: 1000, margin: "30px auto" }}>
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Input.Search
           placeholder="Nhập từ khóa..."
-          style={{
-            flex: 1,
-            padding: 8,
-            borderRadius: 5,
-            border: "1px solid #ccc",
-          }}
-          onKeyDown={(e) => {
-            if (e.code === "Enter") setSearch(e.target.value);
-          }}
+          onSearch={(value) => setSearch(value)}
+          style={{ width: 200 }}
         />
 
-        {/* filter Priority */}
         <select
           value={filterPriority}
           onChange={(e) => {
@@ -123,7 +114,6 @@ const Todos = () => {
           <option value="3">Cao</option>
         </select>
 
-        {/* sort Priority */}
         <select
           value={sortOrder}
           onChange={(e) => {
@@ -151,17 +141,19 @@ const Todos = () => {
             // dataToday.setDate(dataToday.getDate() + 1);
             const valueDate = dataToday.toISOString().slice(0, 10);
             setFilterComplete(e.target.value);
+
             if (e.target.value === "overdue") {
               setFilterComplete("false");
               setFilterDueDate_lte(valueDate);
             }
+
             if (e.target.value === "false") {
               setFilterComplete(e.target.value);
               setFilterDueDate_gte(valueDate);
             }
 
             if (e.target.value === "true") {
-              setFilterComplete(e.target.value);
+              setFilterDueDate_lte(false);
             }
           }}
         >
@@ -171,93 +163,76 @@ const Todos = () => {
           <option value="true">Hoàn thành</option>
         </select>
 
-        <button onClick={handleReset}>reset</button>
-      </div>
-
-      <div>
+        <Button onClick={handleReset}>Reset</Button>
         <Link to="add">
-          <button>Thêm mới công việc</button>
+          <Button type="primary">Thêm mới công việc</Button>
         </Link>
-      </div>
+      </Space>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: 15,
-        }}
-      >
+      <Row gutter={[16, 16]}>
         {todos.length > 0 ? (
           todos.map((item, index) => {
             const status = CheckCompleted(item);
             const priority = getPriorityLabel(item.priority);
             return (
-              <div
-                key={index}
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: 8,
-                  padding: 15,
-                  backgroundColor: "#fafafa",
-                  boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-                }}
-              >
-                <h3 style={{ margin: "0 0 10px 0" }}>{item.name}</h3>
-                <p style={{ fontSize: 14, color: "#555" }}>
-                  {item.description}
-                </p>
-                <p>
-                  Trạng thái:{" "}
-                  <span style={{ fontWeight: "bold", color: status.color }}>
-                    {status.text}
-                  </span>
-                </p>
-                <p>
-                  Mức độ ưu tiên:{" "}
-                  <span style={{ fontWeight: "bold", color: priority.color }}>
-                    {priority.label}
-                  </span>
-                </p>
-                <p>
-                  Deadline: {new Date(item.dueDate).toLocaleDateString("vi-VN")}
-                </p>
-                <Link to={`${item._id}`}>
-                  <button>Xem chi tiết</button>
-                </Link>
-                <Link to={`update/${item._id}`}>
-                  <button>update</button>
-                </Link>
-
-                <button onClick={() => handleDelete(item._id)}>
-                  Xóa công việc
-                </button>
-              </div>
+              <Col key={index} xs={24} sm={12} md={8}>
+                <Card
+                  title={item.name}
+                  bordered
+                  extra={
+                    <Tag color={status.color} style={{ fontWeight: 500 }}>
+                      {status.text}
+                    </Tag>
+                  }
+                >
+                  <p>{item.description || "Không có mô tả"}</p>
+                  <p>
+                    Mức độ ưu tiên:{" "}
+                    <Tag color={priority.color}>{priority.label}</Tag>
+                  </p>
+                  <p>
+                    Hạn chót:{" "}
+                    {new Date(item.dueDate).toLocaleDateString("vi-VN")}
+                  </p>
+                  <Space>
+                    <Link to={`${item._id}`}>
+                      <Button size="small">Xem chi tiết</Button>
+                    </Link>
+                    <Link to={`update/${item._id}`}>
+                      <Button type="default" size="small">
+                        Cập nhật
+                      </Button>
+                    </Link>
+                    <Button
+                      danger
+                      size="small"
+                      onClick={() => handleDelete(item._id)}
+                    >
+                      Xóa
+                    </Button>
+                  </Space>
+                </Card>
+              </Col>
             );
           })
         ) : (
-          <div style={{ gridColumn: "1/-1", textAlign: "center", padding: 20 }}>
+          <Col span={24} style={{ textAlign: "center", padding: 30 }}>
             Không có công việc
-          </div>
+          </Col>
         )}
-      </div>
+      </Row>
 
       {metaData && metaData.totalPages > 1 && (
         <div style={{ marginTop: 20, textAlign: "center" }}>
           {Array.from({ length: metaData.totalPages }).map((_, index) => (
-            <button
+            <Button
               key={index}
               onClick={() => setCurrentPage(index + 1)}
-              style={{
-                margin: "0 5px",
-                padding: "5px 10px",
-                borderRadius: 5,
-                backgroundColor:
-                  index + 1 === currentPage ? "#f48fb1" : "#e0e0e0",
-                cursor: "pointer",
-              }}
+              type={index + 1 === currentPage ? "primary" : "default"}
+              style={{ margin: "0 5px" }}
             >
               {index + 1}
-            </button>
+            </Button>
           ))}
         </div>
       )}
