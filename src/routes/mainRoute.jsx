@@ -11,7 +11,7 @@ const mainRoute = [
     path: "/",
     Component: MainLayout,
     children: [
-      { index: true, element: <Navigate to={"/todos"} /> },
+      { index: true, element: <Navigate to={"/auth/login"} /> },
       { path: "todos", Component: Todos },
       { path: "important", Component: ImportantPage },
       { path: "todos/:id", Component: TodoDetailPage },
