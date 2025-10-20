@@ -1,6 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { message } from "antd";
-import Password from "antd/es/input/Password";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { registerPost } from "../../api/apiAuth";
@@ -11,24 +9,14 @@ import { toast } from "react-toastify";
 const RegisterPage = () => {
   const registerSchema = z
     .object({
-      userName: z
-        .string({ message: "Username phải là string" })
-        .trim()
-        .nonempty({ message: "Username ko được để trống" })
-        .min(3, { message: "Username phải lớn hơn hoặc bằng 3 ký tự" })
-        .max(30, { message: "Username tối đa 30 ký tự" }),
+      userName: z.string().nonempty("Username ko được để trống"),
       email: z
-        .string({ message: "Email phải là string" })
-        .trim()
-        .nonempty({ message: "Email ko được để trống" })
-        .email("Phải đúng định dạng email"),
-      password: z
-        .string({ message: "Password phải là string" })
-        .nonempty("Mật khẩu không được để trống")
-        .min(7, "Mật khẩu phải có ít nhất 7 ký tự")
-        .max(19, "Mật khẩu không được quá 19 ký tự"),
+        .string()
+        .nonempty("Email ko được để trống")
+        .email("Email sai định dạng"),
+      password: z.string().min(7, "Tối thiểu 7 ký tự"),
       confirmPassword: z.string().nonempty("Vui lòng nhập lại mật khẩu"),
-      agreeToTerms: z.boolean().refine((check) => check === true, {
+      agreeToTerms: z.boolean().refine((v) => v === true, {
         message: "Bạn phải đồng ý với điều khoản",
       }),
     })
@@ -36,12 +24,15 @@ const RegisterPage = () => {
       path: ["confirmPassword"],
       message: "Mật khẩu nhập lại không khớp",
     });
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(registerSchema) });
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
   const nav = useNavigate();
 
   const submit = async (data) => {
@@ -51,47 +42,94 @@ const RegisterPage = () => {
         email: data.email,
         password: data.password,
       });
-      // console.log(data);
       toast.success("Đăng ký thành công");
       reset();
       nav("/auth/login");
-    } catch (error) {
-      console.log(error);
+    } catch {
       toast.error("Lỗi");
     }
   };
+
   return (
-    <div>
-      <form action="" onSubmit={handleSubmit(submit)}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <form
+        onSubmit={handleSubmit(submit)}
+        className="bg-white p-8 rounded-xl shadow-md w-full max-w-md space-y-5"
+      >
+        <h2 className="text-2xl font-semibold text-center text-blue-600 mb-4">
+          Đăng ký tài khoản
+        </h2>
+
         <div>
-          <label htmlFor="">Username</label>
-          <input type="text" {...register("userName")} />
-          {errors.userName && <span>{errors.userName.message}</span>}
-        </div>
-        <div>
-          <label htmlFor="">Email</label>
-          <input type="email" {...register("email")} />
-          {errors.email && <span>{errors.email.message}</span>}
-        </div>
-        <div>
-          <label htmlFor="">Password</label>
-          <input type="password" {...register("password")} />
-          {errors.password && <span>{errors.password.message}</span>}
-        </div>
-        <div>
-          <label htmlFor="">Confirm password</label>
-          <input type="password" {...register("confirmPassword")} />
-          {errors.confirmPassword && (
-            <span>{errors.confirmPassword.message}</span>
+          <label className="block text-sm font-medium mb-1">Username</label>
+          <input
+            type="text"
+            {...register("userName")}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.userName && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.userName.message}
+            </p>
           )}
         </div>
+
         <div>
-          <label htmlFor="">Đồng ý điều khoản</label>
-          <input type="checkbox" {...register("agreeToTerms")} />
-          {errors.agreeToTerms && <span>{errors.agreeToTerms.message}</span>}
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <input
+            type="email"
+            {...register("email")}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+          )}
         </div>
 
-        <button>Đăng ký</button>
+        <div>
+          <label className="block text-sm font-medium mb-1">Mật khẩu</label>
+          <input
+            type="password"
+            {...register("password")}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Nhập lại mật khẩu
+          </label>
+          <input
+            type="password"
+            {...register("confirmPassword")}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input type="checkbox" {...register("agreeToTerms")} />
+          <label>Tôi đồng ý với điều khoản</label>
+        </div>
+        {errors.agreeToTerms && (
+          <p className="text-red-500 text-sm">{errors.agreeToTerms.message}</p>
+        )}
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition"
+        >
+          Đăng ký
+        </button>
       </form>
     </div>
   );
