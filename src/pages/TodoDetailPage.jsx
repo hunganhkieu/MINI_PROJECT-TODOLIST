@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { CheckCompleted, getPriorityLabel } from "../utils/todoHelpers";
 
 const TodoDetailPage = () => {
   const { id } = useParams();
@@ -22,26 +23,6 @@ const TodoDetailPage = () => {
     fetchProductId();
   }, []);
 
-  const CheckCompleted = (item) => {
-    if (!item) return { text: "Đang tải...", color: "#9e9e9e" };
-    if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
-    if (new Date(item.dueDate) < new Date())
-      return { text: "Quá hạn", color: "#f44336" };
-    return { text: "Đang thực hiện", color: "#ff9800" };
-  };
-
-  const getPriorityLabel = (priority) => {
-    switch (priority) {
-      case 1:
-        return { label: "Thấp", color: "#90caf9" };
-      case 2:
-        return { label: "Trung bình", color: "#fdd835" };
-      case 3:
-        return { label: "Cao", color: "#f44336" };
-      default:
-        return { label: "Không xác định", color: "#9e9e9e" };
-    }
-  };
   const status = CheckCompleted(todos);
   const priority = getPriorityLabel(todos?.priority);
 
@@ -79,7 +60,7 @@ const TodoDetailPage = () => {
         </p>
         <p>Deadline: {new Date(todos?.dueDate).toLocaleDateString("vi-VN")}</p>
       </div>
-      <Link to="/">
+      <Link to="/todos">
         <button>Quay lại</button>
       </Link>
     </div>

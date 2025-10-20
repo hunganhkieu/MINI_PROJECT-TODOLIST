@@ -1,19 +1,20 @@
 export const CheckCompleted = (item) => {
-  if (item.isCompleted) return { text: "Hoàn thành", color: "green" };
+  if (!item) return { text: "Đang tải...", color: "#9e9e9e" };
+  if (item.isCompleted) return { text: "Hoàn thành", color: "#4caf50" };
   if (new Date(item.dueDate) < new Date())
-    return { text: "Quá hạn", color: "red" };
-  return { text: "Đang thực hiện", color: "orange" };
+    return { text: "Quá hạn", color: "#f44336" };
+  return { text: "Đang thực hiện", color: "#ff9800" };
 };
 
 export const getPriorityLabel = (priority) => {
   switch (priority) {
     case 1:
-      return { label: "Thấp", color: "blue" };
+      return { label: "Thấp", color: "#90caf9" };
     case 2:
-      return { label: "Trung bình", color: "gold" };
+      return { label: "Trung bình", color: "#fdd835" };
     case 3:
-      return { label: "Cao", color: "red" };
+      return { label: "Cao", color: "#f44336" };
     default:
-      return { label: "Không xác định", color: "default" };
+      return { label: "Không xác định", color: "#9e9e9e" };
   }
 };
