@@ -1,30 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerPost } from "../../api/apiAuth";
 import { useNavigate } from "react-router-dom";
-import z from "zod";
 import { toast } from "react-toastify";
+import { registerSchema } from "../../schemas/authSchema";
 
 const RegisterPage = () => {
-  const registerSchema = z
-    .object({
-      userName: z.string().nonempty("Username ko được để trống"),
-      email: z
-        .string()
-        .nonempty("Email ko được để trống")
-        .email("Email sai định dạng"),
-      password: z.string().min(7, "Tối thiểu 7 ký tự"),
-      confirmPassword: z.string().nonempty("Vui lòng nhập lại mật khẩu"),
-      agreeToTerms: z.boolean().refine((v) => v === true, {
-        message: "Bạn phải đồng ý với điều khoản",
-      }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      path: ["confirmPassword"],
-      message: "Mật khẩu nhập lại không khớp",
-    });
-
   const {
     register,
     handleSubmit,
@@ -34,19 +16,21 @@ const RegisterPage = () => {
     resolver: zodResolver(registerSchema),
   });
   const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const submit = async (data) => {
     try {
-      await registerPost({
-        userName: data.userName,
-        email: data.email,
-        password: data.password,
-      });
+      setLoading(true);
+      delete data.confirmPassword;
+      delete data.agreeToTerms;
+      await registerPost();
       toast.success("Đăng ký thành công");
       reset();
       nav("/auth/login");
     } catch {
       toast.error("Lỗi");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,9 +110,14 @@ const RegisterPage = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition"
+          disabled={loading}
+          className={`w-full py-2 font-semibold text-white rounded-lg transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
         >
-          Đăng ký
+          {loading ? "Đang đăng ký..." : "Đăng ký"}
         </button>
       </form>
     </div>

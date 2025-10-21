@@ -2,25 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import z from "zod";
 import { loginPost } from "../../api/apiAuth";
 import { toast } from "react-toastify";
+import { loginSchema } from "../../schemas/authSchema";
 
 const LoginPage = () => {
-  const loginSchema = z.object({
-    email: z
-      .string({ message: "Email phải là string" })
-      .trim()
-      .nonempty({ message: "Email ko được để trống" })
-      .email("Phải đúng định dạng email"),
-    password: z
-      .string({ message: "Password phải là string" })
-      .nonempty("Mật khẩu không được để trống")
-      .min(7, "Mật khẩu phải có ít nhất 7 ký tự")
-      .max(19, "Mật khẩu không được quá 19 ký tự"),
-    rememberMe: z.boolean().optional(),
-  });
-
   const {
     register,
     handleSubmit,
