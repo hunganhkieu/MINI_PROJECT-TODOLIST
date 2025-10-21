@@ -1,15 +1,15 @@
 import { toast } from "react-toastify";
 import api from ".";
 
-const URL = "https://api-class-o1lo.onrender.com/api/anhkh/auth";
+// "https://api-class-o1lo.onrender.com/api/anhkh";
 
 export const registerPost = async (formData) => {
-  const { data } = await api.post("/register", formData);
+  const { data } = await api.post("/auth/register", formData);
   return data;
 };
 export const loginPost = async (formData) => {
   try {
-    const { data } = await api.post("/login", formData);
+    const { data } = await api.post("/auth/login", formData);
     return data;
   } catch (err) {
     const errors = err.response?.data?.errors;

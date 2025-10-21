@@ -23,7 +23,12 @@ const RegisterPage = () => {
       setLoading(true);
       delete data.confirmPassword;
       delete data.agreeToTerms;
-      await registerPost();
+      await registerPost({
+        userName: data.userName,
+        email: data.email,
+        password: data.password,
+      });
+      console.log(data);
       toast.success("Đăng ký thành công");
       reset();
       nav("/auth/login");
