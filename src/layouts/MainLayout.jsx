@@ -3,6 +3,7 @@ import { Layout, theme, Typography, Button } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
+import { toast } from "react-toastify";
 
 const { Content, Header } = Layout;
 const { Title } = Typography;
@@ -15,10 +16,12 @@ const MainLayout = () => {
   } = theme.useToken();
 
   const handleLogout = () => {
+    if (!confirm("Bạn có muốn đăng xuất ko?")) return;
     localStorage.removeItem("accessToken");
     localStorage.removeItem("auth");
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("auth");
+    toast.success("Đăng xuất thành công");
     nav("/auth/login");
   };
 
