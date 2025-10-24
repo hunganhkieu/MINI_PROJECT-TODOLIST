@@ -20,11 +20,18 @@ const LoginPage = () => {
   const submit = async (data) => {
     try {
       setLoading(true);
-      const res = await loginPost(data);
+      const { data: res } = await loginPost(data);
       toast.success("Đăng nhập thành công");
       reset();
-      const storage = data.rememberMe ? localStorage : sessionStorage;
-      storage.setItem("auth", JSON.stringify(res));
+      if (data.rememberMe) {
+        localStorage.setItem("auth", JSON.stringify(res));
+        localStorage.setItem("accessToken", res.accessToken);
+      } else {
+        sessionStorage.setItem("auth", JSON.stringify(res));
+        sessionStorage.setItem("accessToken", res.accessToken);
+      }
+      console.log(res);
+
       nav("/todos");
     } catch (error) {
       const apiErrors = error.response?.data?.errors;

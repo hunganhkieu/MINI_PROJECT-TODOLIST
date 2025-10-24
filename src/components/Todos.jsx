@@ -36,7 +36,15 @@ const Todos = () => {
           sortOrder ? `&_sort=priority&_order=${sortOrder}` : ""
         }${filterComplete ? `&isCompleted=${filterComplete}` : filterComplete}${
           filterDueDate_lte ? `&dueDate_lte=${filterDueDate_lte}` : ""
-        }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`
+        }${filterDueDate_gte ? `&dueDate_gte=${filterDueDate_gte}` : ""}`,
+        {
+          headers: {
+            Authorization: `Bearer ${
+              localStorage.getItem("accessToken") ||
+              sessionStorage.getItem("accessToken")
+            }`,
+          },
+        }
       ).then((res) => res.json());
       setTodos(response.data);
       setMetaData(response.meta);

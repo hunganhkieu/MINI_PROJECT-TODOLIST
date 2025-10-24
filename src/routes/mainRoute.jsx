@@ -5,11 +5,16 @@ import { Navigate } from "react-router-dom";
 import ImportantPage from "../pages/ImportantPage";
 import TodoDetailPage from "../pages/TodoDetailPage";
 import FormTodo from "../pages/FormTodo";
+import PrivateRoute from "./protected/PrivateRoute";
 
 const mainRoute = [
   {
     path: "/",
-    Component: MainLayout,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     children: [
       { index: true, element: <Navigate to={"/auth/login"} /> },
       { path: "todos", Component: Todos },

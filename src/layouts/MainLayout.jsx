@@ -1,18 +1,26 @@
-// MainLayout.js
 import React, { useState } from "react";
-import { Layout, theme } from "antd";
-import { Outlet } from "react-router-dom";
+import { Layout, theme, Typography, Button } from "antd";
+import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
-import { Header } from "antd/es/layout/layout";
 
-const { Content } = Layout;
+const { Content, Header } = Layout;
+const { Title } = Typography;
 
 const MainLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const nav = useNavigate();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("auth");
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("auth");
+    nav("/auth/login");
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -22,7 +30,22 @@ const MainLayout = () => {
         setCollapsed={setCollapsed}
       />
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}></Header>
+        <Header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 24px",
+            background: colorBgContainer,
+          }}
+        >
+          <Title level={4} style={{ margin: 0 }}>
+            Hi guy
+          </Title>
+          <Button type="primary" danger onClick={handleLogout}>
+            Đăng xuất
+          </Button>
+        </Header>
         <Content style={{ margin: "16px" }}>
           <div
             style={{

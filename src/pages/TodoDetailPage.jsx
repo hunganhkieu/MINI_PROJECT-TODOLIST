@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Card, Tag, Button, Space } from "antd";
 import { CheckCompleted, getPriorityLabel } from "../utils/todoHelpers";
 
 const TodoDetailPage = () => {
@@ -13,7 +14,6 @@ const TodoDetailPage = () => {
       );
       const { data } = await response.json();
       setTodos(data);
-      // console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -23,46 +23,46 @@ const TodoDetailPage = () => {
     fetchProductId();
   }, []);
 
+  if (!todos)
+    return (
+      <div style={{ textAlign: "center", marginTop: 50 }}>Đang tải...</div>
+    );
+
   const status = CheckCompleted(todos);
   const priority = getPriorityLabel(todos?.priority);
 
   return (
-    <div>
-      <h2>Chi tiết công việc</h2>
+    <div style={{ maxWidth: 800, margin: "30px auto" }}>
+      <h2 style={{ fontWeight: "bold", marginBottom: 20 }}>
+        Chi tiết công việc
+      </h2>
 
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: 8,
-          padding: 15,
-          backgroundColor: "#fafafa",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h3 style={{ margin: "0 0 10px 0" }}>{todos?.name}</h3>
-        <p style={{ fontSize: 14, color: "#555" }}>{todos?.description}</p>
-        <p>
-          Trạng thái:{" "}
-          <span style={{ fontWeight: "bold", color: status.color }}>
+      <Card
+        title={todos?.name}
+        bordered
+        extra={
+          <Tag color={status.color} style={{ fontWeight: 500 }}>
             {status?.text}
-          </span>
-        </p>
+          </Tag>
+        }
+      >
+        <p>{todos?.description || "Không có mô tả"}</p>
+
         <p>
-          Mức độ ưu tiên:{" "}
-          <span
-            style={{
-              fontWeight: "bold",
-              color: priority?.color,
-            }}
-          >
-            {priority?.label}
-          </span>
+          Mức độ ưu tiên: <Tag color={priority?.color}>{priority?.label}</Tag>
         </p>
+
         <p>Deadline: {new Date(todos?.dueDate).toLocaleDateString("vi-VN")}</p>
-      </div>
-      <Link to="/todos">
-        <button>Quay lại</button>
-      </Link>
+
+        <Space style={{ marginTop: 20 }}>
+          <Link to="/todos">
+            <Button type="default">Quay lại</Button>
+          </Link>
+          <Link to={`/todos/update/${todos?._id}`}>
+            <Button type="primary">Cập nhật</Button>
+          </Link>
+        </Space>
+      </Card>
     </div>
   );
 };
