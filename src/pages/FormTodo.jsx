@@ -19,6 +19,8 @@ const { Option } = Select;
 const FormTodo = () => {
   const { id } = useParams();
   const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     priority: 1,
@@ -43,6 +45,8 @@ const FormTodo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
     formData.priority = Number(formData.priority);
     if (
       !formData.name ||
@@ -70,6 +74,8 @@ const FormTodo = () => {
     } catch (error) {
       console.log(error);
       message.error("Đã xảy ra lỗi khi xử lý");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -156,10 +162,7 @@ const FormTodo = () => {
                 name="isCompleted"
                 checked={formData.isCompleted}
                 onChange={handleCheckBox}
-                disabled={
-                  formData.isCompleted ||
-                  new Date(formData.dueDate) < new Date()
-                }
+                disabled={formData.isCompleted}
               >
                 Hoàn thành
               </Checkbox>
@@ -167,7 +170,13 @@ const FormTodo = () => {
           )}
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              loading={loading}
+              disabled={loading}
+            >
               {!id ? "Thêm mới" : "Cập nhật"}
             </Button>
           </Form.Item>

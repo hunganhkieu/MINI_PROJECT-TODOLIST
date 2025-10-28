@@ -30,7 +30,7 @@ const LoginPage = () => {
         sessionStorage.setItem("auth", JSON.stringify(res));
         sessionStorage.setItem("accessToken", res.accessToken);
       }
-      console.log(res);
+      // console.log(res);
 
       nav("/todos");
     } catch (error) {
