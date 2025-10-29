@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createTodo, getTodoId, updateTodo } from "../api/apiTodo";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const FormTodo = () => {
   const { id } = useParams();
@@ -28,28 +29,29 @@ const FormTodo = () => {
       formData.name.length < 3 ||
       formData.name.length > 80
     ) {
-      alert(
+      toast.error(
         "Tên ko được để trống, tên phải tối thiểu 3 ký tự và tối đa 80 ký tự"
       );
       return;
     }
 
     if (!formData.dueDate) {
-      alert("Hạn hoàn thành công việc ko được để trống");
+      toast.error("Hạn hoàn thành công việc ko được để trống");
       return;
     }
+
     setLoading(true);
 
     try {
       if (!id) {
         await createTodo(formData);
-        alert("Thêm mới thành công");
+        toast.success("Thêm mới thành công");
         nav("/todos");
         // console.log(formData);
       }
       if (id) {
         await updateTodo(id, formData);
-        alert("Cập nhật thành công");
+        toast.success("Cập nhật thành công");
         nav("/todos");
         // console.log(formData);
       }
@@ -171,7 +173,7 @@ const FormTodo = () => {
               name="isCompleted"
               checked={formData.isCompleted}
               onChange={handleCheckBox}
-              disabled={formData.isCompleted}
+              // disabled={formData.isCompleted}
               className="h-4 w-4 text-blue-600 accent-blue-500"
             />
             <label className="text-gray-700 font-medium">Hoàn thành</label>
