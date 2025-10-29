@@ -1,26 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { createTodo, getTodoId, updateTodo } from "../api/apiTodo";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Checkbox,
-  Button,
-  Card,
-  message,
-} from "antd";
-import dayjs from "dayjs";
-
-const { TextArea } = Input;
-const { Option } = Select;
 
 const FormTodo = () => {
   const { id } = useParams();
   const nav = useNavigate();
-  const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     name: "",
     priority: 1,
@@ -28,52 +12,50 @@ const FormTodo = () => {
     dueDate: "",
     isCompleted: false,
   });
-
+  const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSelectChange = (value) => {
-    setFormData({ ...formData, priority: value });
-  };
-
-  const handleDateChange = (date, dateString) => {
-    setFormData({ ...formData, dueDate: dateString });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
-    setLoading(true);
     formData.priority = Number(formData.priority);
+
     if (
       !formData.name ||
       formData.name.length < 3 ||
       formData.name.length > 80
     ) {
-      message.warning("Tên công việc phải từ 3 - 80 ký tự");
+      alert(
+        "Tên ko được để trống, tên phải tối thiểu 3 ký tự và tối đa 80 ký tự"
+      );
       return;
     }
+
     if (!formData.dueDate) {
-      message.warning("Vui lòng chọn hạn hoàn thành công việc");
+      alert("Hạn hoàn thành công việc ko được để trống");
       return;
     }
+    setLoading(true);
 
     try {
       if (!id) {
         await createTodo(formData);
-        message.success("Thêm mới thành công");
+        alert("Thêm mới thành công");
         nav("/todos");
-      } else {
+        // console.log(formData);
+      }
+      if (id) {
         await updateTodo(id, formData);
-        message.success("Cập nhật thành công");
+        alert("Cập nhật thành công");
         nav("/todos");
+        // console.log(formData);
       }
     } catch (error) {
       console.log(error);
-      message.error("Đã xảy ra lỗi khi xử lý");
+      alert("Lỗi rồi");
     } finally {
       setLoading(false);
     }
@@ -109,79 +91,106 @@ const FormTodo = () => {
   }, [id]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 40 }}>
-      <Card
-        title={!id ? "Thêm công việc mới" : "Cập nhật công việc"}
-        style={{ width: 500, boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 space-y-5 border border-gray-100"
       >
-        <Form layout="vertical" onSubmitCapture={handleSubmit}>
-          <Form.Item label="Tên công việc" required>
-            <Input
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Nhập tên công việc"
+        <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
+          {!id ? "Thêm công việc mới" : "Cập nhật công việc"}
+        </h2>
+
+        {/* Tên công việc */}
+        <div className="flex flex-col">
+          <label className="text-gray-700 font-medium mb-1">
+            Tên công việc
+          </label>
+          <input
+            type="text"
+            name="name"
+            onChange={handleChange}
+            value={formData.name}
+            className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Nhập tên công việc"
+          />
+        </div>
+
+        {/* Mức độ ưu tiên */}
+        <div className="flex flex-col">
+          <label className="text-gray-700 font-medium mb-1">
+            Mức độ ưu tiên
+          </label>
+          <select
+            name="priority"
+            id="priority"
+            onChange={handleChange}
+            value={formData.priority}
+            className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value={1}>Thấp</option>
+            <option value={2}>Trung bình</option>
+            <option value={3}>Cao</option>
+          </select>
+        </div>
+
+        {/* Mô tả công việc */}
+        <div className="flex flex-col">
+          <label className="text-gray-700 font-medium mb-1">
+            Mô tả công việc
+          </label>
+          <textarea
+            name="description"
+            id="description"
+            onChange={handleChange}
+            value={formData.description}
+            className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+            rows="3"
+            placeholder="Nhập mô tả công việc"
+          ></textarea>
+        </div>
+
+        {/* Hạn chót hoàn thành */}
+        <div className="flex flex-col">
+          <label className="text-gray-700 font-medium mb-1">
+            Hạn chót hoàn thành công việc
+          </label>
+          <input
+            type="date"
+            name="dueDate"
+            onChange={handleChange}
+            value={formData.dueDate}
+            className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+        </div>
+
+        {/* Trạng thái công việc */}
+        {id && (
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              name="isCompleted"
+              checked={formData.isCompleted}
+              onChange={handleCheckBox}
+              disabled={formData.isCompleted}
+              className="h-4 w-4 text-blue-600 accent-blue-500"
             />
-          </Form.Item>
+            <label className="text-gray-700 font-medium">Hoàn thành</label>
+          </div>
+        )}
 
-          <Form.Item label="Mức độ ưu tiên">
-            <Select
-              value={formData.priority}
-              onChange={handleSelectChange}
-              name="priority"
-            >
-              <Option value={1}>Thấp</Option>
-              <Option value={2}>Trung bình</Option>
-              <Option value={3}>Cao</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item label="Mô tả công việc">
-            <TextArea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              placeholder="Nhập mô tả công việc"
-            />
-          </Form.Item>
-
-          <Form.Item label="Hạn chót hoàn thành công việc" required>
-            <DatePicker
-              style={{ width: "100%" }}
-              name="dueDate"
-              onChange={handleDateChange}
-              value={formData.dueDate ? dayjs(formData.dueDate) : null}
-              format="YYYY-MM-DD"
-            />
-          </Form.Item>
-
-          {id && (
-            <Form.Item label="Trạng thái công việc">
-              <Checkbox
-                name="isCompleted"
-                checked={formData.isCompleted}
-                onChange={handleCheckBox}
-                disabled={formData.isCompleted}
-              >
-                Hoàn thành
-              </Checkbox>
-            </Form.Item>
-          )}
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              loading={loading}
-              disabled={loading}
-            >
-              {!id ? "Thêm mới" : "Cập nhật"}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+        {/* Nút Submit */}
+        <button
+          type="submit"
+          className={`w-full py-2 font-semibold text-white rounded-lg transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
+          disabled={loading}
+        >
+          {!id ? "Thêm mới" : "Cập nhật"}
+        </button>
+      </form>
     </div>
   );
 };
