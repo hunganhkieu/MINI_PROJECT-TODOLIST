@@ -98,6 +98,13 @@ const FormTodo = () => {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 space-y-5 border border-gray-100"
       >
+        <button
+          type="button"
+          onClick={() => nav(-1)}
+          className="w-full py-2 font-semibold text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50 transition"
+        >
+          Quay lại
+        </button>
         <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">
           {!id ? "Thêm công việc mới" : "Cập nhật công việc"}
         </h2>

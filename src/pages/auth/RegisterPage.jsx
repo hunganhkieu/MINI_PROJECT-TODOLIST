@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerPost } from "../../api/apiAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { registerSchema } from "../../schemas/authSchema";
 
@@ -124,6 +124,13 @@ const RegisterPage = () => {
         >
           {loading ? "Đang đăng ký..." : "Đăng ký"}
         </button>
+
+        <Link
+          to="/auth/login"
+          className="block text-center w-full py-2 font-semibold text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50 transition"
+        >
+          Đã có tài khoản? Đăng nhập
+        </Link>
       </form>
     </div>
   );
