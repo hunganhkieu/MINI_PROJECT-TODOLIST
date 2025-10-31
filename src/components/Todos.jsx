@@ -70,6 +70,8 @@ const Todos = () => {
     setFilterPriority("");
     setFilterComplete("");
     setSortOrder("");
+    setFilterDueDate_lte("");
+    setFilterDueDate_gte("");
     setCurrentPage(1);
   };
 

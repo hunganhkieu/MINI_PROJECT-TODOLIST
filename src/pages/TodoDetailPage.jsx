@@ -7,7 +7,7 @@ const TodoDetailPage = () => {
   const { id } = useParams();
   const [todos, setTodos] = useState(null);
 
-  const fetchProductId = async () => {
+  const fetchProductId = async (id) => {
     try {
       const response = await fetch(
         `https://api-class-o1lo.onrender.com/api/anhkh/todos/${id}`
@@ -20,8 +20,8 @@ const TodoDetailPage = () => {
   };
 
   useEffect(() => {
-    fetchProductId();
-  }, []);
+    fetchProductId(id);
+  }, [id]);
 
   if (!todos)
     return (
